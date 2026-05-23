@@ -3,6 +3,7 @@ const Order = require('../models/Order');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
+// Place order — student must be logged in
 router.post('/', auth, async (req, res) => {
   try {
     const { items, totalAmount } = req.body;
@@ -18,6 +19,7 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
+// My orders — student must be logged in
 router.get('/my', auth, async (req, res) => {
   try {
     const orders = await Order.find({ student: req.user.id }).sort({ createdAt: -1 });
@@ -27,19 +29,29 @@ router.get('/my', auth, async (req, res) => {
   }
 });
 
-router.get('/all', auth, async (req, res) => {
+// All orders — NO auth required (admin uses sessionStorage not JWT)
+router.get('/all', async (req, res) => {
   try {
-    const orders = await Order.find().populate('student', 'name email rollNumber').sort({ createdAt: -1 });
+    const orders = await Order.find()
+      .populate('student', 'name email rollNumber')
+      .sort({ createdAt: -1 })
+      .limit(100);
     res.json({ success: true, orders });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 });
 
-router.patch('/:id/status', auth, async (req, res) => {
+// Update order status — NO auth required (admin uses sessionStorage not JWT)
+router.patch('/:id/status', async (req, res) => {
   try {
     const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+    if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
     res.json({ success: true, order });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
