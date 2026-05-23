@@ -34,8 +34,7 @@ router.get('/all', async (req, res) => {
   try {
     const orders = await Order.find()
       .populate('student', 'name email rollNumber')
-      .sort({ createdAt: -1 })
-      .limit(100);
+      .sort({ createdAt: -1 });
     res.json({ success: true, orders });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
