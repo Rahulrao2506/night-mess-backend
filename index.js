@@ -12,7 +12,7 @@ app.use(helmet());
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
+const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 500 });
 app.use(limiter);
 
 app.use('/api/auth', require('./routes/auth'));
