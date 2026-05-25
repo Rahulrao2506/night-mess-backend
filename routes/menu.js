@@ -48,5 +48,14 @@ router.patch('/:id', async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
+router.patch('/availability', async (req, res) => {
+  try {
+    const { name, isAvailable } = req.body;
+    await MenuItem.findOneAndUpdate({ name }, { isAvailable });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
 
 module.exports = router;
